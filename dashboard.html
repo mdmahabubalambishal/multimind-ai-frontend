@@ -1068,13 +1068,16 @@
   function renderReportView(data) {
     let r = data.report || {};
 
-    // If report is a string, parse it
+    // Deep parse — handle all cases
     if (typeof r === 'string') {
       try { r = JSON.parse(r); } catch {}
     }
-
-    // If still has nested report key
-    if (r.report) r = r.report;
+    if (typeof r === 'string') {
+      try { r = JSON.parse(r); } catch {}
+    }
+    if (r.report) {
+      r = typeof r.report === 'string' ? JSON.parse(r.report) : r.report;
+    }
 
     const sources = data.sources || r.sources || [];
 
