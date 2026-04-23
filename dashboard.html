@@ -1066,7 +1066,16 @@
   }
 
   function renderReportView(data) {
-    const r = data.report || {};
+    let r = data.report || {};
+
+    // If report is a string, parse it
+    if (typeof r === 'string') {
+      try { r = JSON.parse(r); } catch {}
+    }
+
+    // If still has nested report key
+    if (r.report) r = r.report;
+
     const sources = data.sources || r.sources || [];
 
     const sections = (r.sections || []).map(s => `
@@ -1078,6 +1087,12 @@
       <div class="takeaway">
         <span class="takeaway-n">0${i+1}</span>
         <span>${esc(t)}</span>
+      </div>`).join('');
+
+    const recommendations = (r.recommendations || []).map((rec, i) => `
+      <div class="takeaway">
+        <span class="takeaway-n">0${i+1}</span>
+        <span>${esc(rec)}</span>
       </div>`).join('');
 
     const srcs = sources.map(s => `
@@ -1108,6 +1123,11 @@
             <div class="report-section">
               <div class="report-section-label">Key Takeaways</div>
               <div class="takeaways">${takeaways}</div>
+            </div>` : ''}
+          ${recommendations ? `
+            <div class="report-section">
+              <div class="report-section-label">Recommendations</div>
+              <div class="takeaways">${recommendations}</div>
             </div>` : ''}
           ${r.conclusion ? `
             <div class="report-section">
